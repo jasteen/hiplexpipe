@@ -103,7 +103,7 @@ class Stages(object):
         cores = self.get_stage_options('apply_undr_rover', 'cores')
         safe_make_dir('variants/undr_rover')
         safe_make_dir('variants/undr_rover/coverdir')
-        coverfile = "variants/undr_rover/coverdir/" 
+        coverfile = variants/undr_rover/coverdir/ 
 #+ sample_id + "_" + readid + ".coverage"
 
         command = 'undr_rover --primer_coords {coord_file} ' \
