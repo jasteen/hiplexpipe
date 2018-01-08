@@ -41,7 +41,6 @@ class Stages(object):
         self.hapmap = self.get_options('hapmap')
         self.snpeff_conf = self.get_options('snpeff_conf')
         self.bamclipper = self.get_options('bamclipper')
-        self.vep_path = self.get_options('vep_path')
         self.vt_path = self.get_options('vt_path')
         self.coord_file = self.get_options('coord_file')
         self.target_bed = self.get_options('target_bed')
@@ -142,7 +141,7 @@ class Stages(object):
         self.run_picard('sort_bam_picard', picard_args)
 
     def primary_bam(self, bam_in, sbam_out):
-        '''On keep primary alignments in the BAM file using samtools'''
+        '''Only keep primary alignments in the BAM file using samtools'''
         command = 'samtools view -h -q 1 -f 2 -F 4 -F 8 -F 256 -b ' \
                     '-o {sbam_out} {bam_in}'.format(
                         bam_in=bam_in, sbam_out=sbam_out)
@@ -409,7 +408,7 @@ class Stages(object):
         '''Apply VEP'''
         vcf_in = inputs
         cores = self.get_stage_options('apply_vep', 'cores')
-        vep_command = "{vep_path}/variant_effect_predictor.pl --cache --refseq --offline {other_vep} --fasta {reference} " \
+        vep_command = "vep --cache --refseq --offline {other_vep} --fasta {reference} " \
                     "-i {vcf_in} --sift b --polyphen b --symbol --numbers --biotype --total_length --hgvs " \
                     "--format vcf -o {vcf_vep} --force_overwrite --vcf " \
                     "--fields Consequence,Codons,Amino_acids,Gene,SYMBOL,Feature,EXON,PolyPhen,SIFT," \
