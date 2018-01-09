@@ -103,14 +103,15 @@ class Stages(object):
         cores = self.get_stage_options('apply_undr_rover', 'cores')
         safe_make_dir('variants/undr_rover')
         safe_make_dir('variants/undr_rover/coverdir')
-        coverfile = "variants/undr_rover/coverdir/" 
-#+ sample_id + "_" + readid + ".coverage"
+        coverdir = "variants/undr_rover/coverdir"
+        coverfile = "variants/undr_rover/coverdir/" + sample_id + "_" + readid + ".coverage"
 
         command = 'undr_rover --primer_coords {coord_file} ' \
                   '--primer_sequences {primer_file} ' \
                   '--reference {reference} ' \
                   '--out {vcf_output} ' \
-                  '--coverdir {coverfile} ' \
+                  '--coverdir {coverdir} ' \
+                  '--coverfile {coverfile}' \
                   '--proportionthresh {proportionthresh} ' \
                   '--absthresh {absthresh} ' \
                   '--max_variants {maxvariants} ' \
@@ -118,7 +119,7 @@ class Stages(object):
                         coord_file=self.coord_file, primer_file=self.primer_file,
                         reference=self.reference,
                         vcf_output=vcf_output,
-#                        coverdir=self.coverdir,
+                        coverdir=coverdir,
                         proportionthresh=self.proportionthresh,
                         absthresh=self.absthresh,
                         maxvariants=self.maxvariants,
