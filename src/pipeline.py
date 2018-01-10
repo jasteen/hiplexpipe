@@ -101,10 +101,10 @@ def make_pipeline(state):
 
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
-    pipeline.transform(
+    (pipeline.transform(
         task_func=stages.call_haplotypecaller_gatk,
         name='call_haplotypecaller_gatk',
-        input=output_from('clip_bam'),
+        input=output_from('primary_bam'),
         # filter=suffix('.merged.dedup.realn.bam'),
        # filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).primary.primerclipped.bam'),
         filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).primary.bam'),
