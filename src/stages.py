@@ -15,7 +15,7 @@ import os
 PICARD_JAR = '/usr/local/picard/2.9.2/picard.jar'
 SNPEFF_JAR = '/usr/local/easybuild/software/snpEff/4.1d-Java-1.7.0_80/snpEff.jar'
 
-GATK_JAR = '$GATK_HOME/GenomeAnalysisTK.jar'
+GATK_JAR = '/usr/local/gatk/3.7/executable/GenomeAnalysisTK.jar'
 
 def java_command(jar_path, mem_in_gb, command_args):
     '''Build a string for running a java command'''
