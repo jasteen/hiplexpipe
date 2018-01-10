@@ -104,14 +104,14 @@ class Stages(object):
         safe_make_dir('variants/undr_rover')
         safe_make_dir('variants/undr_rover/coverdir')
         coverdir = "variants/undr_rover/coverdir"
-        coverfile = "variants/undr_rover/coverdir/" + sample_id + "_" + readid + ".coverage"
+        coverfile = sample_id + "_" + readid + ".coverage"
 
         command = 'undr_rover --primer_coords {coord_file} ' \
                   '--primer_sequences {primer_file} ' \
                   '--reference {reference} ' \
                   '--out {vcf_output} ' \
                   '--coverdir {coverdir} ' \
-                  '--coverfile {coverfile}' \
+                  '--coverfile {coverfile} ' \
                   '--proportionthresh {proportionthresh} ' \
                   '--absthresh {absthresh} ' \
                   '--max_variants {maxvariants} ' \
