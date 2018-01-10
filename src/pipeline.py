@@ -96,7 +96,7 @@ def make_pipeline(state):
         name='clip_bam',
         input=output_from('primary_bam'),
         filter=suffix('.primary.bam'),
-        output='.primary.primerclipped.bam')
+        output='alignments/{sample[0]}_{readid[0]}/{sample[0]}_{readid[0]}.primary.primerclipped.bam')
         .follows('index_bam'))
 
     ###### GATK VARIANT CALLING ######
