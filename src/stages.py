@@ -39,23 +39,16 @@ class Stages(object):
         self.one_k_g_indels = self.get_options('one_k_g_indels')
         self.one_k_g_highconf_snps = self.get_options('one_k_g_highconf_snps')
         self.hapmap = self.get_options('hapmap')
-        self.snpeff_conf = self.get_options('snpeff_conf')
-        self.bamclipper = self.get_options('bamclipper')
-        self.vt_path = self.get_options('vt_path')
+#        self.bamclipper = self.get_options('bamclipper')
         self.coord_file = self.get_options('coord_file')
         self.target_bed = self.get_options('target_bed')
         self.interval_file = self.get_options('interval_file')
         self.primer_file = self.get_options('primer_file')
-        self.primer_bedpe_file = self.get_options('primer_bedpe_file')
+#        self.primer_bedpe_file = self.get_options('primer_bedpe_file')
         self.proportionthresh = self.get_options('proportionthresh')
         self.absthresh = self.get_options('absthresh')
         self.maxvariants = self.get_options('maxvariants')
-        self.fragment_bed = self.get_options('fragment_bed')
-        self.annolua = self.get_options('annolua')
-        self.anno = self.get_options('anno')
-        self.hrfile = self.get_options('hrfile')
         self.other_vep = self.get_options('other_vep')
-        self.snpeff_path = self.get_options('snpeff_path')
 
     def run_picard(self, stage, args):
         mem = int(self.state.config.get_stage_options(stage, 'mem'))
@@ -128,11 +121,11 @@ class Stages(object):
                         fastq_read2=fastq_read2_in)
         run_stage(self.state, 'apply_undr_rover', command)
 
-    def clip_bam(self, bam_in, sorted_bam_out):
-        '''Clip the BAM file using Bamclipper'''
-        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
-                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
-        run_stage(self.state, 'clip_bam', bamclipper_args)
+#    def clip_bam(self, bam_in, sorted_bam_out):
+#        '''Clip the BAM file using Bamclipper'''
+#        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
+#                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
+#        run_stage(self.state, 'clip_bam', bamclipper_args)
 
     def sort_bam_picard(self, bam_in, sorted_bam_out):
         '''Sort the BAM file using Picard'''
@@ -240,91 +233,11 @@ class Stages(object):
                                                             cores=cores, vcf_in=vcf_in, vcf_out=vcf_out)
         self.run_gatk('apply_variant_filtration_gatk', gatk_args)
 
-    ###########
-
-    # coverage picard
-    def target_coverage(self, bam_in, coverage_out):
-        '''Calculate coverage using Picard'''
-        safe_make_dir('coverage')
-        picard_args = 'CollectHsMetrics INPUT={bam_in} OUTPUT={coverage_out} ' \
-                      'R={reference} BAIT_INTERVALS={interval_file} ' \
-                      'TARGET_INTERVALS={interval_file}'.format(
-                          bam_in=bam_in, coverage_out=coverage_out,
-                          reference=self.reference, interval_file=self.interval_file)
-        self.run_picard('target_coverage', picard_args)
-
-    # coverage bam
-    def target_coverage_bamutil(self, bam_in, coverage_out):
-        '''Calculate coverage using bamutil'''
-        command = 'bam stats --basic --in {bam_in} &> {coverage_out}'.format(
-                          bam_in=bam_in, coverage_out=coverage_out)
-        run_stage(self.state, 'target_coverage_bamutil', command)
-
-    # coverage bam interval
-    def target_coverage_bamutil_interval(self, bam_in, coverage_out):
-        '''Calculate target coverage using bamutil'''
-        command = 'bam stats --basic --in {bam_in} --regionList {fragment_bed} &> {coverage_out}'.format(
-                          bam_in=bam_in, fragment_bed = self.fragment_bed, coverage_out=coverage_out)
-        run_stage(self.state, 'target_coverage_bamutil_interval', command)
-
-    # multicov
-    def apply_multicov(self, bam_in, multicov):
-        '''Samtools mpileup'''
-        # bam_in = bam_in
-        bams = ' '.join([bam for bam in bam_in])
-        safe_make_dir('coverage')
-        command = 'bedtools multicov -bams {bams} -bed {target_bed} > {multicov}'.format(
-                          bams=bams, target_bed=self.target_bed, multicov=multicov)
-        run_stage(self.state, 'apply_multicov', command)
-
-    # multicov plots
-    def apply_multicov_plots(self, bam_in, multicov):
-        '''Generate multicov plots'''
-        walltime_hours = self.get_stage_options('apply_multicov_plots', 'walltime')
-        h, m = walltime_hours.split(':')
-        walltime = int(h) * 3600 + int(m) * 60
-        # safe_make_dir('variants')
-        # command = 'jupyter nbconvert --to html --execute coverage_analysis_main.ipynb ' \
-        #             '--ExecutePreprocessor.timeout={walltime}'.format(walltime=walltime)
-        command = 'jupyter nbconvert --to html coverage_analysis_main.ipynb ' \
-                    '--ExecutePreprocessor.timeout={walltime}'.format(walltime=walltime)
-        run_stage(self.state, 'apply_multicov_plots', command)
-
-    # summarize picard
-    def apply_summarize_picard(self, input, output):
-        '''Summarize picard coverage'''
-        input = input
-        # bams = ' '.join([bam for bam in bam_in])
-        # safe_make_dir('variants')
-        command = 'python coverage_summary.py > {output} '.format(
-                          output=output)
-        run_stage(self.state, 'apply_summarize_picard', command)
-
-    # samtools
-    def apply_samtools_mpileup(self, bam_in, mpileup_out_bcf):
-        '''Samtools mpileup'''
-        # bam_in = bam_in
-        bams = ' '.join([bam for bam in bam_in])
-        safe_make_dir('variants')
-        command = 'samtools mpileup -t DP,AD,ADF,ADR,SP,INFO/AD,INFO/ADF,INFO/ADR -go {mpileup_out_bcf} ' \
-                  '-f {reference} {bams}'.format(
-                          mpileup_out_bcf=mpileup_out_bcf,reference=self.reference,bams=bams)
-        run_stage(self.state, 'apply_samtools_mpileup', command)
-
-    # bcftools
-    def apply_bcftools(self, mpileup_in, vcf_out):
-        '''Bcftools call variants'''
-        mpileup_in = mpileup_in
-        # mpileup_in = ' '.join([vcf for vcf in vcf_files_in])
-        command = 'bcftools call -vmO v -o {vcf_out} {mpileup_in}'.format(
-                          vcf_out=vcf_out,mpileup_in=mpileup_in)
-        run_stage(self.state, 'apply_bcftools', command)
-
     def apply_vep(self, inputs, vcf_out):
         '''Apply VEP'''
         vcf_in = inputs
         cores = self.get_stage_options('apply_vep', 'cores')
-        vep_command = "vep --cache --refseq --offline {other_vep} --fasta {reference} " \
+        vep_command = "vep --cache --dir_cache {other_vep} --assembly GRCh37 --refseq --offline --fasta {reference} " \
                     "-i {vcf_in} --sift b --polyphen b --symbol --numbers --biotype --total_length --hgvs " \
                     "--format vcf -o {vcf_vep} --force_overwrite --vcf " \
                     "--fields Consequence,Codons,Amino_acids,Gene,SYMBOL,Feature,EXON,PolyPhen,SIFT," \
