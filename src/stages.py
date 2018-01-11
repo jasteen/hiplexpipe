@@ -222,82 +222,6 @@ class Stages(object):
                     .format(reference=self.reference, cores=cores, vcf_in=vcf_in, vcf_out=vcf_out)
         self.run_gatk('variant_annotator_gatk', gatk_args)
 
-    # def snp_recalibrate_gatk(self, genotype_vcf_in, outputs):
-    #     '''SNP recalibration using GATK'''
-    #     recal_snp_out, tranches_snp_out, snp_plots_r_out = outputs
-    #     cores = self.get_stage_options('snp_recalibrate_gatk', 'cores')
-    #     gatk_args = "-T VariantRecalibrator --disable_auto_index_creation_and_locking_when_reading_rods " \
-    #                 "-R {reference} --minNumBadVariants 5000 --num_threads {cores} " \
-    #                 "-resource:hapmap,known=false,training=true,truth=true,prior=15.0 {hapmap} " \
-    #                 "-resource:omni,known=false,training=true,truth=true,prior=12.0 {one_k_g_snps} " \
-    #                 "-resource:1000G,known=false,training=true,truth=false,prior=10.0 {one_k_g_highconf_snps} " \
-    #                 "-an DP -an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR " \
-    #                 "-input {genotype_vcf} --recal_file {recal_snp} --tranches_file {tranches_snp} " \
-    #                 "-rscriptFile {snp_plots} -mode SNP".format(reference=self.reference,
-    #                                                             cores=cores, hapmap=self.hapmap, one_k_g_snps=self.one_k_g_snps,
-    #                                                             one_k_g_highconf_snps=self.one_k_g_highconf_snps, genotype_vcf=genotype_vcf_in,
-    #                                                             recal_snp=recal_snp_out, tranches_snp=tranches_snp_out, snp_plots=snp_plots_r_out)
-    #     self.run_gatk('snp_recalibrate_gatk', gatk_args)
-    #
-    # def indel_recalibrate_gatk(self, genotype_vcf_in, outputs):
-    #     '''INDEL recalibration using GATK'''
-    #     recal_indel_out, tranches_indel_out, indel_plots_r_out = outputs
-    #     cores = self.get_stage_options('indel_recalibrate_gatk', 'cores')
-    #     gatk_args = "-T VariantRecalibrator --disable_auto_index_creation_and_locking_when_reading_rods " \
-    #                 "-R {reference} --minNumBadVariants 5000 --num_threads {cores} " \
-    #                 "-resource:mills,known=false,training=true,truth=true,prior=12.0 {mills_hg19} " \
-    #                 "-resource:1000G,known=false,training=true,truth=true,prior=10.0 {one_k_g_indels} " \
-    #                 "-an DP -an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR " \
-    #                 "-input {genotype_vcf} -recalFile {recal_indel} " \
-    #                 "-tranchesFile {tranches_indel} -rscriptFile {indel_plots} " \
-    #                 " -mode INDEL --maxGaussians 4".format(reference=self.reference,
-    #                                       cores=cores, mills_hg19=self.mills_hg19, one_k_g_indels=self.one_k_g_indels,
-    #                                       genotype_vcf=genotype_vcf_in, recal_indel=recal_indel_out,
-    #                                       tranches_indel=tranches_indel_out, indel_plots=indel_plots_r_out)
-    #     self.run_gatk('indel_recalibrate_gatk', gatk_args)
-    #
-    # def apply_snp_recalibrate_gatk(self, inputs, vcf_out):
-    #     '''Apply SNP recalibration using GATK'''
-    #     genotype_vcf_in, [recal_snp, tranches_snp] = inputs
-    #     cores = self.get_stage_options('apply_snp_recalibrate_gatk', 'cores')
-    #     gatk_args = "-T ApplyRecalibration --disable_auto_index_creation_and_locking_when_reading_rods " \
-    #                 "-R {reference} --ts_filter_level 99.5 --num_threads {cores} " \
-    #                 "-input {genotype_vcf} -recalFile {recal_snp} -tranchesFile {tranches_snp} " \
-    #                 "-mode SNP -o {vcf_out}".format(reference=self.reference,
-    #                                                 cores=cores, genotype_vcf=genotype_vcf_in, recal_snp=recal_snp,
-    #                                                 tranches_snp=tranches_snp, vcf_out=vcf_out)
-    #     self.run_gatk('apply_snp_recalibrate_gatk', gatk_args)
-    #
-    # def apply_indel_recalibrate_gatk(self, inputs, vcf_out):
-    #     '''Apply INDEL recalibration using GATK'''
-    #     genotype_vcf_in, [recal_indel, tranches_indel] = inputs
-    #     cores = self.get_stage_options('apply_indel_recalibrate_gatk', 'cores')
-    #     gatk_args = "-T ApplyRecalibration --disable_auto_index_creation_and_locking_when_reading_rods " \
-    #                 "-R {reference} --ts_filter_level 99.0 --num_threads {cores} " \
-    #                 "-input {genotype_vcf} -recalFile {recal_indel} -tranchesFile {tranches_indel} " \
-    #                 "-mode INDEL -o {vcf_out}".format(reference=self.reference,
-    #                                                   cores=cores, genotype_vcf=genotype_vcf_in, recal_indel=recal_indel,
-    #                                                   tranches_indel=tranches_indel, vcf_out=vcf_out)
-    #     self.run_gatk('apply_indel_recalibrate_gatk', gatk_args)
-
-    # def apply_variant_filtration_gatk(self, inputs, vcf_out):
-    #     '''Apply Variant Filtration using gatk'''
-    #     vcf_in = inputs
-    #     cores = self.get_stage_options('apply_variant_filtration_gatk', 'cores')
-    #     gatk_args = "-T VariantFiltration --disable_auto_index_creation_and_locking_when_reading_rods " \
-    #                 "-R {reference} " \
-    #                 "--filterExpression \"QUAL < 30.0\" --filterName \"VeryLowQual\" " \
-    #                 "--filterExpression \"QD < 2.0\" --filterName \"LowQD\" " \
-    #                 "--filterExpression \"DP < 10\" --filterName \"LowCoverage\" " \
-    #                 "--filterExpression \"MQ < 40.0\" --filterName \"LowMappingQual\" " \
-    #                 "--filterExpression \"SOR > 4.0\" --filterName \"StrandBias\" " \
-    #                 "--filterExpression \"HRun > 7.0\" --filterName \"HRun7\" " \
-    #                 "--clusterWindowSize 10 " \
-    #                 "--clusterSize 4 " \
-    #                 "--variant {vcf_in} -o {vcf_out}".format(reference=self.reference,
-    #                                                   cores=cores, vcf_in=vcf_in, vcf_out=vcf_out)
-    #     self.run_gatk('apply_variant_filtration_gatk', gatk_args)
-
     def apply_variant_filtration_gatk(self, inputs, vcf_out):
         '''Apply Variant Filtration using gatk'''
         vcf_in = inputs
@@ -396,16 +320,6 @@ class Stages(object):
                           vcf_out=vcf_out,mpileup_in=mpileup_in)
         run_stage(self.state, 'apply_bcftools', command)
 
-    def apply_vt(self, inputs, vcf_out):
-        '''Apply NORM'''
-        vcf_in = inputs
-        cores = self.get_stage_options('apply_vt', 'cores')
-        vt_command = "{vt_path} decompose -s {vcf_in} - | {vt_path2} normalize -r {reference} - | " \
-                    "{vt_path3} uniq - -o {vcf_out}".format(
-                    vt_path=self.vt_path, vcf_in=vcf_in, vt_path2=self.vt_path, reference=self.reference,
-                    vt_path3=self.vt_path, vcf_out=vcf_out)
-        run_stage(self.state, 'apply_vt', vt_command)
-
     def apply_vep(self, inputs, vcf_out):
         '''Apply VEP'''
         vcf_in = inputs
@@ -416,74 +330,6 @@ class Stages(object):
                     "--fields Consequence,Codons,Amino_acids,Gene,SYMBOL,Feature,EXON,PolyPhen,SIFT," \
                     "Protein_position,BIOTYPE,HGVSc,HGVSp,cDNA_position,CDS_position,HGVSc,HGVSp,cDNA_position,CDS_position,PICK " \
                     "--fork {threads} --flag_pick".format(
-                    reference=self.reference, vep_path=self.vep_path, vcf_in=vcf_in, vcf_vep=vcf_out, other_vep=self.other_vep, threads=cores)
+                    reference=self.reference, vcf_in=vcf_in, vcf_vep=vcf_out, other_vep=self.other_vep, threads=cores)
         run_stage(self.state, 'apply_vep', vep_command)
 
-    def apply_bcf(self, inputs, vcf_out):
-        '''Apply BCF'''
-        vcf_in = inputs
-        cores = self.get_stage_options('apply_bcf', 'cores')
-        command = "bcftools filter -e \"ALT='*'\" {vcf_in} > {vcf_out}".format(cores=cores,
-                            vcf_in=vcf_in, vcf_out=vcf_out)
-        run_stage(self.state, 'apply_bcf', command)
-
-    def apply_snpeff(self, inputs, vcf_out):
-        '''Apply SnpEFF'''
-        vcf_in = inputs
-        #cores = self.get_stage_options('apply_snpeff', 'cores')  apply_snpeff
-        # mem = int(self.state.config.get_stage_options(stage, 'mem'))
-        mem = int(self.get_stage_options('apply_snpeff', 'mem')) - 2
-        snpeff_command = "java -Xmx{mem}g -jar {snpeff_path} eff -c {snpeff_conf} " \
-                    "-canon GRCh37.75 {vcf_in} | bgzip -c > {vcf_out}".format(
-                    mem=mem, snpeff_path=self.snpeff_path, snpeff_conf=self.snpeff_conf,
-                    vcf_in=vcf_in, vcf_out=vcf_out)
-        run_stage(self.state, 'apply_snpeff', snpeff_command)
-        #run_snpeff(self.state, 'apply_snpeff', snpeff_command)
-
-    # ORIGINAL WITH RUN_JAVA
-    # def apply_snpeff(self, inputs, vcf_out):
-    #     '''Apply SnpEFF'''
-    #     vcf_in = inputs
-    #     #cores = self.get_stage_options('apply_snpeff', 'cores')
-    #     snpeff_command = "eff -c {snpeff_conf} -canon GRCh37.75 {vcf_in} > {vcf_out}".format(
-    #                 snpeff_conf=self.snpeff_conf, vcf_in=vcf_in, vcf_out=vcf_out)
-    #     self.run_snpeff('apply_snpeff', snpeff_command)
-    #     #run_snpeff(self.state, 'apply_snpeff', snpeff_command)
-
-    def apply_vcfanno(self, inputs, vcf_out):
-        '''Apply anno'''
-        vcf_in = inputs
-        #cores = self.get_stage_options('apply_snpeff', 'cores')
-        anno_command = "./vcfanno_linux64 -lua {annolua} {anno} {vcf_in} > {vcf_out}".format(
-                    annolua=self.annolua, anno=self.anno, vcf_in=vcf_in, vcf_out=vcf_out)
-        run_stage(self.state, 'apply_vcfanno', anno_command)
-
-    def apply_cat_vcf(self, inputs, vcf_out):
-        '''Concatenate and sort undr_rover VCF files for downstream analysis'''
-        vcfs = ' '.join([vcf for vcf in inputs])
-        # safe_make_dir('variants')
-        command = 'vcf-concat {vcfs} | vcf-sort -c | bgzip -c > {vcf_out} '.format(vcfs=vcfs,vcf_out=vcf_out)
-        run_stage(self.state, 'apply_cat_vcf', command)
-
-    def apply_tabix(self, input, vcf_out):
-        '''bgzip the vcf file in prepartion for bcftools annotation'''
-        vcf = input
-        command = "tabix -p vcf {vcf}".format(vcf=vcf)
-        run_stage(self.state, 'apply_tabix', command)
-
-    def apply_homopolymer_ann(self, inputs, vcf_out):
-        '''Apply HomopolymerRun annotation to undr_rover output'''
-        vcf_in = inputs
-        # safe_make_dir('variants')
-        command = "echo \"##INFO=<ID=HRUN,Number=1,Type=String,Description=\"HRun\">\" > header.tmp; "\
-                    "bcftools annotate -a {hrfile} -c CHROM,FROM,TO,HRUN " \
-                    "-h header.tmp " \
-                    "{vcf_in} > {vcf_out}".format(hrfile=self.hrfile,vcf_in=vcf_in,vcf_out=vcf_out)
-        run_stage(self.state, 'apply_cat_vcf', command)
-
-    # def apply_cat_vcf(self, inputs, vcf_out):
-    #     '''Concatenate and sort undr_rover VCF files for downstream analysis'''
-    #     vcfs = ' '.join([vcf for vcf in inputs])
-    #     # safe_make_dir('variants')
-    #     command = 'vcf-concat {vcfs} | vcf-sort -c | bgzip -c > {vcf_out} '.format(vcfs=vcfs,vcf_out=vcf_out)
-    #     run_stage(self.state, 'apply_cat_vcf', command)
