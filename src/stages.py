@@ -253,7 +253,7 @@ class Stages(object):
 
     def coverage_bed(self, bam_in, txt_out):
         ''' make coverage files '''
-        command = "coverageBed -b alignments/{bam_in} -a ${interval_file} -hist | grep all > alignments/metrics/{txt_out}".format(
+        command = "coverageBed -b alignments/{bam_in} -a {interval_file} -hist | grep all > alignments/metrics/{txt_out}".format(
                      bam_in=bam_in, interval_file=interval_file, txt_out=txt_out)
 
     def genome_reads(self, bam_in, txt_out):
