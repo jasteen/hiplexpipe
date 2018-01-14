@@ -48,35 +48,35 @@ def make_pipeline(state):
 
     #generate mapping metrics.
     pipeline.transform(
-        task_func=stage.intersect_bed,
+        task_func=stages.intersect_bed,
         name='intersect_bed',
         input=output_from('align_bwa'),
         filter=suffix('.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
-        task_func=stage.coverage_bed,
+        task_func=stages.coverage_bed,
         name='coverage_bed',
         input=output_from('intersect_bed'),
         filter=suffix('.intersectbed.bam'),
         output='.bedtools_hist_all.txt')
 
     pipeline.transform(
-        task_func=stage.genome_reads,
+        task_func=stages.genome_reads,
         name='genome_reads',
         input=output_from('primary_bam'),
         filter=suffix('.primary.bam'),
         output='.mapped_to_genome.txt')
 
     pipeline.transform(
-        task_func=stage.target_reads,
+        task_func=stages.target_reads,
         name='target_reads',
         input=output_from('intersect_bed'),
         filter=suffix('.intersectbed.bam'),
         output='.mapped_to_target.txt')
 
     pipeline.transform(
-        task_func=stage.total_reads,
+        task_func=stages.total_reads,
         name='target_reads',
         input=output_from('align_bwa'),
         filter=suffix('.bam'),
