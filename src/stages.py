@@ -270,7 +270,7 @@ class Stages(object):
         run_stage(self.state, 'target_reads', command)
 
     def total_reads(self, bam_in, txt_out):
-       '''count the total number of reads that we started with'''
+        '''count the total number of reads that we started with'''
         command = 'samtools view -c alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'total_reads', command)
