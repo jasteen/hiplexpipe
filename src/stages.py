@@ -247,14 +247,14 @@ class Stages(object):
         '''intersect the bed file with the interval file '''
         safe_make_dir('alignments/metrics')
         command = "intersectBed -abam alignments/{bam_in} -a {interval_file} > alignments/metrics/{bam_out} ".format(
-                     bam_in=bam_in, interval_file=interval_file, bam_out=bam_out)
+                     bam_in=bam_in, interval_file=self.interval_file, bam_out=bam_out)
         run_stage(self.state, 'intersect_bed', command)           
 
 
     def coverage_bed(self, bam_in, txt_out):
         ''' make coverage files '''
         command = "coverageBed -b alignments/{bam_in} -a {interval_file} -hist | grep all > alignments/metrics/{txt_out}".format(
-                     bam_in=bam_in, interval_file=interval_file, txt_out=txt_out)
+                     bam_in=bam_in, interval_file=self.interval_file, txt_out=txt_out)
 
     def genome_reads(self, bam_in, txt_out):
         '''count reads that map to the genome'''
