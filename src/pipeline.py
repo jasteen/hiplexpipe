@@ -77,7 +77,7 @@ def make_pipeline(state):
 
     pipeline.transform(
         task_func=stages.total_reads,
-        name='target_reads',
+        name='total_reads',
         input=output_from('align_bwa'),
         filter=suffix('.bam'),
         output='.total_raw_reads')
