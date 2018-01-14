@@ -31,7 +31,7 @@ def make_pipeline(state):
         # Match the R1 (read 1) FASTQ file and grab the path and sample name.
         # This will be the first input to the stage.
         # Hi-Plex example: OHI031002-P02F04_S318_L001_R1_001.fastq
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9_]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq.gz'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9_-]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq.gz'),
 
         # Add one more inputs to the stage:
         #    1. The corresponding R2 FASTQ file
@@ -96,7 +96,7 @@ def make_pipeline(state):
         input=output_from('original_fastqs'),
         # Match the R1 (read 1) FASTQ file and grab the path and sample name.
         # This will be the first input to the stage.
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9_]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq.gz'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9_-]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq.gz'),
         add_inputs=add_inputs(
             '{path[0]}/{sample[0]}_R2_{lib[0]}.fastq.gz'),
         extras=['{sample[0]}'],
