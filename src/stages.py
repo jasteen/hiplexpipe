@@ -252,24 +252,24 @@ class Stages(object):
         run_stage(self.state, 'intersect_bed', command)           
 
 
-    def coverage_bed(self, bam_in, txt_out)
+    def coverage_bed(self, bam_in, txt_out):
         ''' make coverage files '''
         command = "coverageBed -b alignments/{bam_in} -a ${interval_file} -hist | grep all > alignments/metrics/{txt_out}".format(
                      bam_in=bam_in, interval_file=interval_file, txt_out=txt_out)
 
-    def genome_reads(self, bam_in, txt_out)
+    def genome_reads(self, bam_in, txt_out):
         '''count reads that map to the genome'''
         command = 'samtools view -c -F4 alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'genome_reads', command)
 
-    def target_reads(self, bam_in, txt_out)
+    def target_reads(self, bam_in, txt_out):
         '''count reads that map to target panel'''
         command = 'samtools view -c -F4 alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'target_reads', command)
 
-    def total_reads(self, bam_in, txt_out)
+    def total_reads(self, bam_in, txt_out):
        'count the total number of reads that we started with'''
         command = 'samtools view -c alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
@@ -278,19 +278,12 @@ class Stages(object):
 
 #    def generate_stats(self, txt_out)
 
-intersect_bed
-coverage_bed
-genome_reads
-target_reads
-total_reads
 
 
-
-
-Rscript --vanilla ~/vh83/pipelines/code/summary_stat.R \
-        metrics/${sample_run_name}.sort.bedtools_hist_all.txt \
-        metrics/${sample_run_name}.sort.mapped_to_genome.txt \
-        metrics/${sample_run_name}.sort.mapped_to_target.txt \
-        metrics/${sample_run_name}.sort.total_raw_reads.txt \
-        ${sample_run_name} \
-        ${summary_prefix}_summary_coverage.txt
+#Rscript --vanilla ~/vh83/pipelines/code/summary_stat.R \
+#        metrics/${sample_run_name}.sort.bedtools_hist_all.txt \
+#        metrics/${sample_run_name}.sort.mapped_to_genome.txt \
+#        metrics/${sample_run_name}.sort.mapped_to_target.txt \
+#        metrics/${sample_run_name}.sort.total_raw_reads.txt \
+#        ${sample_run_name} \
+#        ${summary_prefix}_summary_coverage.txt
