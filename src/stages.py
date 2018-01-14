@@ -98,7 +98,6 @@ class Stages(object):
                   '--primer_sequences {primer_file} ' \
                   '--reference {reference} ' \
                   '--out {vcf_output} ' \
-                  #'--coverdir {coverdir} ' \
                   '--coverfile {coverdir}/{coverfile} ' \
                   '--proportionthresh {proportionthresh} ' \
                   '--absthresh {absthresh} ' \
