@@ -44,7 +44,7 @@ def make_pipeline(state):
         # sample specific configuration options
         extras=['{sample[0]}', '{lib[0]}'],
         # The output file name is the sample name with a .bam extension.
-        output='alignments/{sample[0]}/{sample[0]}.bam')
+        output='alignments/{sample[0]}.bam')
 
     #generate mapping metrics.
     pipeline.transform(
