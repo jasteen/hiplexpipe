@@ -245,7 +245,7 @@ class Stages(object):
 
     def intersect_bed(self, bam_in, bam_out):
         '''intersect the bed file with the interval file '''
-        safe_make_dir('metrics/')
+        safe_make_dir('alignments/metrics')
         command = "intersectBed -abam {bam_in} -a {interval_file} > {bam_out} ".format(
                      bam_in=bam_in, interval_file=self.interval_file, bam_out=bam_out)
         run_stage(self.state, 'intersect_bed', command)           
