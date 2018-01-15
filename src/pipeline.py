@@ -132,7 +132,7 @@ def make_pipeline(state):
         output='.total_raw_reads')
 
     pipeline.collate(
-        task_func=stage.generate_stats,
+        task_func=stages.generate_stats,
         name='generate_stats',
         input= output_from('coverage_bed', 'genome_reads', 'target_reads', 'total_reads'),
         filter=suffix('.txt'),
