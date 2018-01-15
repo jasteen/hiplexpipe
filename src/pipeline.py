@@ -129,12 +129,12 @@ def make_pipeline(state):
         name='total_reads',
         input=output_from('align_bwa'),
         filter=suffix('.bam'),
-        output='.total_raw_reads')
+        output='.total_raw_reads.txt')
 
     pipeline.collate(
         task_func=stages.generate_stats,
         name='generate_stats',
-        input= output_from('coverage_bed', 'genome_reads', 'target_reads', 'total_reads'),
+        input= regex(r'(.+).(.+).txt'),
         filter=suffix('.txt'),
         extras=['{sample[0]}'],
         output='all_sample.summary.txt')
