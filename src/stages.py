@@ -246,31 +246,31 @@ class Stages(object):
     def intersect_bed(self, bam_in, bam_out):
         '''intersect the bed file with the interval file '''
         safe_make_dir('alignments/metrics')
-        command = "intersectBed -abam alignments/{bam_in} -a {interval_file} > alignments/metrics/{bam_out} ".format(
+        command = "intersectBed -abam {bam_in} -a {interval_file} > metrics/{bam_out} ".format(
                      bam_in=bam_in, interval_file=self.interval_file, bam_out=bam_out)
         run_stage(self.state, 'intersect_bed', command)           
 
 
     def coverage_bed(self, bam_in, txt_out):
         ''' make coverage files '''
-        command = "coverageBed -b alignments/{bam_in} -a {interval_file} -hist | grep all > alignments/metrics/{txt_out}".format(
+        command = "coverageBed -b {bam_in} -a {interval_file} -hist | grep all > metrics/{txt_out}".format(
                      bam_in=bam_in, interval_file=self.interval_file, txt_out=txt_out)
 
     def genome_reads(self, bam_in, txt_out):
         '''count reads that map to the genome'''
-        command = 'samtools view -c -F4 alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
+        command = 'samtools view -c -F4 {bam_in} > metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'genome_reads', command)
 
     def target_reads(self, bam_in, txt_out):
         '''count reads that map to target panel'''
-        command = 'samtools view -c -F4 alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
+        command = 'samtools view -c -F4 {bam_in} > metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'target_reads', command)
 
     def total_reads(self, bam_in, txt_out):
         '''count the total number of reads that we started with'''
-        command = 'samtools view -c alignments/{bam_in} > alignments/metrics/{txt_out}'.format(
+        command = 'samtools view -c {bam_in} > metrics/{txt_out}'.format(
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'total_reads', command)
 
