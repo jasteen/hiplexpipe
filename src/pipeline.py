@@ -99,8 +99,8 @@ def make_pipeline(state):
     pipeline.transform(
         task_func=stages.intersect_bed,
         name='intersect_bed',
-        input=output_from('align_bwa'),
-        filter=suffix('.bam'),
+        input=output_from('primary_bam'),
+        filter=suffix('.primary.bam'),
         output='alignments/metrics/{sample[0]}.intersectbed.bam')
 
     pipeline.transform(
