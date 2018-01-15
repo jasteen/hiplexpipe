@@ -131,12 +131,13 @@ def make_pipeline(state):
         filter=suffix('.bam'),
         output='.total_raw_reads')
 
-#    pipeline.transform(
-#        task_func=stage.generate_stats,
-#        name='generate_stats',
-#        input=output_from('intersect_bed'),
-#        filter=suffix('intersectbed.bam'),
-#        output='.summary.txt')
+    pipeline.collate(
+        task_func=stage.generate_stats,
+        name='generate_stats',
+        input= output_from('coverage_bed', 'genome_reads', 'target_reads', 'total_reads'),
+        filter=suffix('.txt'),
+        extras=['{sample[0]}']
+        output='all_sample.summary.txt')
 
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
