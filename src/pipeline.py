@@ -134,8 +134,9 @@ def make_pipeline(state):
     pipeline.collate(
         task_func=stages.generate_stats,
         name='generate_stats',
-        input= regex(r'(.+).(.+).txt'),
-        extras=['{sample[0]}'],
+        regex(r'(.+).(.+).txt'),
+        add_inputs=['\1.bedtools_hist_all.txt', '\1.mapped_to_genome.txt', '\1.mapped_to_target.txt', '\1.total_raw_reads.txt'], 
+        extras=['\1'],
         output='all_sample.summary.txt')
 
     ###### GATK VARIANT CALLING ######
