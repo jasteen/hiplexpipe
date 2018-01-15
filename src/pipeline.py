@@ -46,48 +46,6 @@ def make_pipeline(state):
         # The output file name is the sample name with a .bam extension.
         output='alignments/{sample[0]}.bam')
 
-    #generate mapping metrics.
-    pipeline.transform(
-        task_func=stages.intersect_bed,
-        name='intersect_bed',
-        input=output_from('align_bwa'),
-        filter=suffix('.bam'),
-        output='.intersectbed.bam')
-
-    pipeline.transform(
-        task_func=stages.coverage_bed,
-        name='coverage_bed',
-        input=output_from('intersect_bed'),
-        filter=suffix('.intersectbed.bam'),
-        output='.bedtools_hist_all.txt')
-
-    pipeline.transform(
-        task_func=stages.genome_reads,
-        name='genome_reads',
-        input=output_from('primary_bam'),
-        filter=suffix('.primary.bam'),
-        output='.mapped_to_genome.txt')
-
-    pipeline.transform(
-        task_func=stages.target_reads,
-        name='target_reads',
-        input=output_from('intersect_bed'),
-        filter=suffix('.intersectbed.bam'),
-        output='.mapped_to_target.txt')
-
-    pipeline.transform(
-        task_func=stages.total_reads,
-        name='total_reads',
-        input=output_from('align_bwa'),
-        filter=suffix('.bam'),
-        output='.total_raw_reads')
-
-#    pipeline.transform(
-#        task_func=stage.generate_stats,
-#        name='generate_stats',
-#        input=output_from('intersect_bed'),
-#        filter=suffix('intersectbed.bam'),
-#        output='.bedtools_hist_all.txt')
 
     # Call variants using undr_rover
     pipeline.transform(
@@ -136,6 +94,49 @@ def make_pipeline(state):
 #        filter=suffix('.primary.bam'),
 #        output='.primary.primerclipped.bam')
 #        .follows('index_bam'))
+    
+    # generate mapping metrics.
+    pipeline.transform(
+        task_func=stages.intersect_bed,
+        name='intersect_bed',
+        input=output_from('align_bwa'),
+        filter=suffix('.bam'),
+        output='.intersectbed.bam')
+
+    pipeline.transform(
+        task_func=stages.coverage_bed,
+        name='coverage_bed',
+        input=output_from('intersect_bed'),
+        filter=suffix('.intersectbed.bam'),
+        output='.bedtools_hist_all.txt')
+
+    pipeline.transform(
+        task_func=stages.genome_reads,
+        name='genome_reads',
+        input=output_from('primary_bam'),
+        filter=suffix('.primary.bam'),
+        output='.mapped_to_genome.txt')
+
+    pipeline.transform(
+        task_func=stages.target_reads,
+        name='target_reads',
+        input=output_from('intersect_bed'),
+        filter=suffix('.intersectbed.bam'),
+        output='.mapped_to_target.txt')
+
+    pipeline.transform(
+        task_func=stages.total_reads,
+        name='total_reads',
+        input=output_from('align_bwa'),
+        filter=suffix('.bam'),
+        output='.total_raw_reads')
+
+#    pipeline.transform(
+#        task_func=stage.generate_stats,
+#        name='generate_stats',
+#        input=output_from('intersect_bed'),
+#        filter=suffix('intersectbed.bam'),
+#        output='.summary.txt')
 
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
