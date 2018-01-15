@@ -135,7 +135,6 @@ def make_pipeline(state):
         task_func=stages.generate_stats,
         name='generate_stats',
         input= regex(r'(.+).(.+).txt'),
-        filter=suffix('.txt'),
         extras=['{sample[0]}'],
         output='all_sample.summary.txt')
 
