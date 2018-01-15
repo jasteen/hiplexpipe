@@ -134,7 +134,7 @@ def make_pipeline(state):
     pipeline.collate(
         task_func=stages.generate_stats,
         name='generate_stats',
-        regex=(r'(.+).(.+).txt'),
+        filter = regex(r'(.+).(.+).txt'),
         input=['\1.bedtools_hist_all.txt', '\1.mapped_to_genome.txt', '\1.mapped_to_target.txt', '\1.total_raw_reads.txt'], 
         extras=['\1'],
         output='all_sample.summary.txt')
