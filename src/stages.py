@@ -84,7 +84,7 @@ class Stages(object):
                           fastq_read2=fastq_read2_in,
                           reference=self.reference,
                           bamclipper=self.bamclipper,
-                          primer_bedpe=self.primer_bedpe_file
+                          primer_bedpe=self.primer_bedpe_file,
                           bam=bam_out)
         run_stage(self.state, 'align_bwa', command)
 
