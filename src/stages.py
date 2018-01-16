@@ -258,7 +258,7 @@ class Stages(object):
         ''' make coverage files '''
         command = "coverageBed -b {bam_in} -a {interval_file} -hist | grep all > {txt_out}".format(
                      bam_in=bam_in, interval_file=self.interval_file, txt_out=txt_out)
-        run_stage(self.state, 'coverage_files', command)
+        run_stage(self.state, 'coverage_bed', command)
     
     def genome_reads(self, bam_in, txt_out):
         '''count reads that map to the genome'''
