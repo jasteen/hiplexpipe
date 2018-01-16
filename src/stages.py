@@ -76,12 +76,15 @@ class Stages(object):
         read_group = '"@RG\\tID:{sample}\\tSM:{sample}\\tPU:lib1\\tPL:Illumina"' \
             .format(sample=sample_id)
         command = 'bwa mem -M -t {cores} -R {read_group} {reference} {fastq_read1} {fastq_read2} ' \
+                  '| {bamclipper} -i -p {primer_bedpe_file} -n 1 ' \
                   '| samtools view -b -h -o {bam} -' \
                   .format(cores=cores,
                           read_group=read_group,
                           fastq_read1=fastq_read1_in,
                           fastq_read2=fastq_read2_in,
                           reference=self.reference,
+                          bamclipper=self.bamclipper,
+                          primer_bedpe=self.primer_bedpe_file
                           bam=bam_out)
         run_stage(self.state, 'align_bwa', command)
 
@@ -115,11 +118,11 @@ class Stages(object):
                         fastq_read2=fastq_read2_in)
         run_stage(self.state, 'apply_undr_rover', command)
 
-    def clip_bam(self, bam_in, sorted_bam_out):
-        '''Clip the BAM file using Bamclipper'''
-        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
-                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
-        run_stage(self.state, 'clip_bam', bamclipper_args)
+#    def clip_bam(self, bam_in, sorted_bam_out):
+#        '''Clip the BAM file using Bamclipper'''
+#        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
+#                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
+#        run_stage(self.state, 'clip_bam', bamclipper_args)
 
     def sort_bam_picard(self, bam_in, sorted_bam_out):
         '''Sort the BAM file using Picard'''
