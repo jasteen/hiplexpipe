@@ -92,7 +92,7 @@ def make_pipeline(state):
         name='clip_bam',
         input=output_from('primary_bam'),
         filter=suffix('.sort.hq.bam'),
-        output='.sort.hq.cliped.bam')
+        output='.sort.hq.clipped.bam')
         .follows('index_bam'))
     
     # generate mapping metrics.
