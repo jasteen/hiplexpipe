@@ -76,31 +76,31 @@ def make_pipeline(state):
         name='primary_bam',
         input=output_from('sort_bam_picard'),
         filter=suffix('.sort.bam'),
-        output='.primary.bam')
+        output='.sort.hq.bam')
 
     # index bam file
     pipeline.transform(
         task_func=stages.index_sort_bam_picard,
         name='index_bam',
         input=output_from('primary_bam'),
-        filter=suffix('.primary.bam'),
-        output='.primary.bam.bai')
+        filter=suffix('.sort.hq.bam'),
+        output='.sort.hq.bam.bai')
 
-#    # Clip the primer_seq from BAM File
-#    (pipeline.transform(
-#        task_func=stages.clip_bam,
-#        name='clip_bam',
-#        input=output_from('primary_bam'),
-#        filter=suffix('.primary.bam'),
-#        output='.primary.primerclipped.bam')
-#        .follows('index_bam'))
+    # Clip the primer_seq from BAM File
+    (pipeline.transform(
+        task_func=stages.clip_bam,
+        name='clip_bam',
+        input=output_from('primary_bam'),
+        filter=suffix('.sort.hq.bam'),
+        output='.sort.hq.cliped.bam')
+        .follows('index_bam'))
     
     # generate mapping metrics.
     pipeline.transform(
         task_func=stages.intersect_bed,
         name='intersect_bed',
-        input=output_from('primary_bam'),
-        filter=suffix('.primary.bam'),
+        input=output_from('clip_bam'),
+        filter=suffix('.sort.hq.clipped.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
