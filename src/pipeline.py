@@ -113,8 +113,8 @@ def make_pipeline(state):
     pipeline.transform(
         task_func=stages.genome_reads,
         name='genome_reads',
-        input=output_from('primary_bam'),
-        filter=suffix('.primary.bam'),
+        input=output_from('clip_bam'),
+        filter=suffix('.sort.hq.clipped.bam'),
         output='.mapped_to_genome.txt')
 
     pipeline.transform(
