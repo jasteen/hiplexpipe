@@ -144,12 +144,10 @@ def make_pipeline(state):
     (pipeline.transform(
         task_func=stages.call_haplotypecaller_gatk,
         name='call_haplotypecaller_gatk',
-        input=output_from('primary_bam'),
-        # filter=suffix('.merged.dedup.realn.bam'),
-       # filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).primary.primerclipped.bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).primary.bam'),
+        input=output_from('clip_bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).sort.hq.clipped.bam'),
         output='variants/gatk/{sample[0]}.g.vcf')
-        .follows('index_sort_bam_picard'))
+        .follows('clip_bam'))
 
     # Combine G.VCF files for all samples using GATK
     pipeline.merge(
