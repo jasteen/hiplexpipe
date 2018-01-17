@@ -271,13 +271,13 @@ class Stages(object):
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'total_reads', command)
 
-    def generate_stats(self, inputs, txt_out):
-        '''run R stats script'''
-        a, b, c, d, e = inputs
-        command = 'Rscript --vanilla /projects/vh83/pipelines/code/modified_summary_stat.R \
-                    {hist_in} {map_genome_in} {map_target_in} {raw_reads_in} {sample_name} \
-                    {txt_out}'.format(hist_in=a, map_genome_in=b, map_target_in=c, raw_reads_in=d , sample_name=e , txt_out=txt_out)
-        run_stage(self.state, 'generate_stats', command)
+#    def generate_stats(self, inputs, txt_out):
+#        '''run R stats script'''
+#        a, b, c, d, e = inputs
+#        command = 'Rscript --vanilla /projects/vh83/pipelines/code/modified_summary_stat.R \
+#                    {hist_in} {map_genome_in} {map_target_in} {raw_reads_in} {sample_name} \
+#                    {txt_out}'.format(hist_in=a, map_genome_in=b, map_target_in=c, raw_reads_in=d , sample_name=e , txt_out=txt_out)
+#        run_stage(self.state, 'generate_stats', command)
 
 
 

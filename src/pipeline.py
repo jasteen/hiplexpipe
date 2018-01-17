@@ -122,13 +122,13 @@ def make_pipeline(state):
         filter=suffix('.clipped.bam'),
         output='.total_raw_reads.txt')
 
-    pipeline.transform(
-        task_func=stages.generate_stats,
-        name='generate_stats',
-        input=output_from(['coverage_bed', 'genome_reads', 'target_reads', 'total_reads']), 
-        filter=formatter('.+/(?P<sample>.+).txt'),
-        extras=['{sample[0]}'],
-        output='all_sample.summary.txt')
+#    pipeline.transform(
+#        task_func=stages.generate_stats,
+#        name='generate_stats',
+#        input=output_from(['coverage_bed', 'genome_reads', 'target_reads', 'total_reads']), 
+#        filter=formatter('.+/(?P<sample>.+).txt'),
+#        extras=['{sample[0]}'],
+#        output='all_sample.summary.txt')
 
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
