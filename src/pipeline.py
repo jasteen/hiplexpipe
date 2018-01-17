@@ -44,7 +44,7 @@ def make_pipeline(state):
         # sample specific configuration options
         extras=['{sample[0]}', '{lib[0]}'],
         # The output file name is the sample name with a .bam extension.
-        output='alignments/{sample[0]}.bam')
+        output='alignments/{sample[0]}.clipped.bam')
 
 
     # Call variants using undr_rover
@@ -67,31 +67,31 @@ def make_pipeline(state):
         task_func=stages.sort_bam_picard,
         name='sort_bam_picard',
         input=output_from('align_bwa'),
-        filter=suffix('.bam'),
-        output='.sort.bam')
+        filter=suffix('.clipped.bam'),
+        output='clipped.sort.bam')
 
     # High quality and primary alignments
     pipeline.transform(
         task_func=stages.primary_bam,
         name='primary_bam',
         input=output_from('sort_bam_picard'),
-        filter=suffix('.sort.bam'),
-        output='.sort.hq.bam')
+        filter=suffix('clipped.sort.bam'),
+        output='clipped.sort.hq.bam')
 
     # index bam file
     pipeline.transform(
         task_func=stages.index_sort_bam_picard,
         name='index_bam',
         input=output_from('primary_bam'),
-        filter=suffix('.sort.hq.bam'),
-        output='.sort.hq.bam.bai')
+        filter=suffix('clipped.sort.hq.bam'),
+        output='clipped.sort.hq.bam.bai')
 
     # generate mapping metrics.
     pipeline.transform(
         task_func=stages.intersect_bed,
         name='intersect_bed',
         input=output_from('primary_bam'),
-        filter=suffix('.sort.hq.bam'),
+        filter=suffix('clippped.sort.hq.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
@@ -105,7 +105,7 @@ def make_pipeline(state):
         task_func=stages.genome_reads,
         name='genome_reads',
         input=output_from('primary_bam'),
-        filter=suffix('.sort.hq.bam'),
+        filter=suffix('clipped.sort.hq.bam'),
         output='.mapped_to_genome.txt')
 
     pipeline.transform(
@@ -119,14 +119,14 @@ def make_pipeline(state):
         task_func=stages.total_reads,
         name='total_reads',
         input=output_from('align_bwa'),
-        filter=suffix('.bam'),
+        filter=suffix('clipped.bam'),
         output='.total_raw_reads.txt')
 
     pipeline.collate(
         task_func=stages.generate_stats,
         name='generate_stats',
         filter=formatter('.+/(?P<sample>.+).(?P<section>.+).txt'),
-        input=['{sample(0)}.bedtools_hist_all.txt', '{sample(0)}.mapped_to_genome.txt', '{sample(0)}.mapped_to_target.txt', '{sample(0)}.total_raw_reads.txt'], 
+        input=output_from(['coverage_bed', 'genome_reads', 'target_reads', 'total_reads']), 
         extras=['{sample(0)}'],
         output='all_sample.summary.txt')
 
@@ -136,7 +136,7 @@ def make_pipeline(state):
         task_func=stages.call_haplotypecaller_gatk,
         name='call_haplotypecaller_gatk',
         input=output_from('primary_bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).sort.hq.bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+)clipped.sort.hq.bam'),
         output='variants/gatk/{sample[0]}.g.vcf')
         .follows('index_sort_bam_picard'))
 
