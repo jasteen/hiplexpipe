@@ -91,7 +91,7 @@ def make_pipeline(state):
         task_func=stages.intersect_bed,
         name='intersect_bed',
         input=output_from('primary_bam'),
-        filter=suffix('.clippped.sort.hq.bam'),
+        filter=suffix('.clipped.sort.hq.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
