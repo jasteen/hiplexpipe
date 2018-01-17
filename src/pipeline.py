@@ -200,8 +200,6 @@ def make_pipeline(state):
         output='.raw.annotate.filtered.vep.vcf')
         .follows('apply_variant_filtration_gatk'))
 
-
-
     # Apply SnpEff
     #(pipeline.transform(
     #    task_func=stages.apply_snpeff,
@@ -237,65 +235,5 @@ def make_pipeline(state):
     #     filter=suffix('.vcf.gz'),
     #     output='.vep.vcf')
     #     .follows('apply_cat_vcf'))
-    #
-    # # Apply vcfanno on concatenated/vep undr_rover vcf file
-    # (pipeline.transform(
-    #     task_func=stages.apply_vcfanno,
-    #     name='apply_vcfanno_ur',
-    #     input=output_from('apply_vep_ur'),
-    #     filter=suffix('.vep.vcf'),
-    #     output='.vep.anno.vcf')
-    #     .follows('apply_vep_ur'))
-    #
-    # # Apply snpeff
-    # (pipeline.transform(
-    #     task_func=stages.apply_snpeff,
-    #     name='apply_snpeff_ur',
-    #     input=output_from('apply_vcfanno_ur'),
-    #     filter=suffix('.vep.anno.vcf'),
-    #     output='.vep.anno.snpeff.vcf.gz')
-    #     .follows('apply_vcfanno_ur'))
-    #
-    # Apply tabix
-    #pipeline.transform(
-    #    task_func=stages.apply_tabix,
-    #    name='apply_tabix',
-    #    input=output_from('apply_cat_vcf'),
-    #    filter=suffix('.vcf.gz'),
-    #    output='.vcf.gz.tbi')
-
-    # # Apply HomopolymerRun
-    # (pipeline.transform(
-    #     task_func=stages.apply_homopolymer_ann,
-    #     name='apply_homopolymer_ann',
-    #     input=output_from('apply_snpeff_ur'),
-    #     filter=suffix('.vep.anno.snpeff.vcf.gz'),
-    #     output='.annotated.vcf')
-    #     .follows('apply_tabix'))
-
-    # # Apply summarize multi coverage
-    # (pipeline.merge(
-    #     task_func=stages.apply_multicov,
-    #     name='apply_multicov',
-    #     input=output_from('primary_bam'),
-    #     # filter=suffix('.primary.bam'),
-    #     output='coverage/all.multicov.txt')
-    #     .follows('index_bam'))
-
-    # Apply summarize picard coverage
-    # (pipeline.merge(
-    #     task_func=stages.apply_summarize_picard,
-    #     name='apply_summarize_picard',
-    #     input=output_from('target_coverage'),
-    #     output='coverage/all.hsmetrics.txt')
-    #     .follows('target_coverage'))
-
-    # # Apply summarize multicov coverage plots
-    # (pipeline.merge(
-    #     task_func=stages.apply_multicov_plots,
-    #     name='apply_multicov_plots',
-    #     input=output_from('apply_multicov'),
-    #     output='coverage/coverage_analysis_main.html')
-    #     .follows('apply_multicov'))
-
+    
     return pipeline
