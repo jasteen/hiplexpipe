@@ -118,12 +118,6 @@ class Stages(object):
                         fastq_read2=fastq_read2_in)
         run_stage(self.state, 'apply_undr_rover', command)
 
-#    def clip_bam(self, bam_in, sorted_bam_out):
-#        '''Clip the BAM file using Bamclipper'''
-#        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
-#                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
-#        run_stage(self.state, 'clip_bam', bamclipper_args)
-
     def sort_bam_picard(self, bam_in, sorted_bam_out):
         '''Sort the BAM file using Picard'''
         picard_args = 'SortSam INPUT={bam_in} OUTPUT={sorted_bam_out} ' \
@@ -248,7 +242,6 @@ class Stages(object):
 
     def intersect_bed(self, bam_in, bam_out):
         '''intersect the bed file with the interval file '''
-        safe_make_dir('alignments/metrics')
         command = "intersectBed -abam {bam_in} -b {interval_file} > {bam_out} ".format(
                      bam_in=bam_in, interval_file=self.interval_file, bam_out=bam_out)
         run_stage(self.state, 'intersect_bed', command)           

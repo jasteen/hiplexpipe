@@ -122,7 +122,7 @@ def make_pipeline(state):
         filter=suffix('.clipped.bam'),
         output='.total_raw_reads.txt')
 
-    pipeline.collate(
+    pipeline.merge(
         task_func=stages.generate_stats,
         name='generate_stats',
         input=output_from(['coverage_bed', 'genome_reads', 'target_reads', 'total_reads']), 
