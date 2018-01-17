@@ -41,7 +41,6 @@ class Stages(object):
         self.hapmap = self.get_options('hapmap')
         self.bamclipper = self.get_options('bamclipper')
         self.coord_file = self.get_options('coord_file')
-        self.target_bed = self.get_options('target_bed')
         self.interval_file = self.get_options('interval_file')
         self.primer_file = self.get_options('primer_file')
         self.primer_bedpe_file = self.get_options('primer_bedpe_file')
