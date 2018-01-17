@@ -68,30 +68,30 @@ def make_pipeline(state):
         name='sort_bam_picard',
         input=output_from('align_bwa'),
         filter=suffix('.clipped.bam'),
-        output='clipped.sort.bam')
+        output='.clipped.sort.bam')
 
     # High quality and primary alignments
     pipeline.transform(
         task_func=stages.primary_bam,
         name='primary_bam',
         input=output_from('sort_bam_picard'),
-        filter=suffix('clipped.sort.bam'),
-        output='clipped.sort.hq.bam')
+        filter=suffix('.clipped.sort.bam'),
+        output='.clipped.sort.hq.bam')
 
     # index bam file
     pipeline.transform(
         task_func=stages.index_sort_bam_picard,
         name='index_bam',
         input=output_from('primary_bam'),
-        filter=suffix('clipped.sort.hq.bam'),
-        output='clipped.sort.hq.bam.bai')
+        filter=suffix('.clipped.sort.hq.bam'),
+        output='.clipped.sort.hq.bam.bai')
 
     # generate mapping metrics.
     pipeline.transform(
         task_func=stages.intersect_bed,
         name='intersect_bed',
         input=output_from('primary_bam'),
-        filter=suffix('clippped.sort.hq.bam'),
+        filter=suffix('.clippped.sort.hq.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
@@ -105,7 +105,7 @@ def make_pipeline(state):
         task_func=stages.genome_reads,
         name='genome_reads',
         input=output_from('primary_bam'),
-        filter=suffix('clipped.sort.hq.bam'),
+        filter=suffix('.clipped.sort.hq.bam'),
         output='.mapped_to_genome.txt')
 
     pipeline.transform(
@@ -119,7 +119,7 @@ def make_pipeline(state):
         task_func=stages.total_reads,
         name='total_reads',
         input=output_from('align_bwa'),
-        filter=suffix('clipped.bam'),
+        filter=suffix('.clipped.bam'),
         output='.total_raw_reads.txt')
 
     pipeline.collate(
@@ -136,7 +136,7 @@ def make_pipeline(state):
         task_func=stages.call_haplotypecaller_gatk,
         name='call_haplotypecaller_gatk',
         input=output_from('primary_bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+)clipped.sort.hq.bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).clipped.sort.hq.bam'),
         output='variants/gatk/{sample[0]}.g.vcf')
         .follows('index_sort_bam_picard'))
 
