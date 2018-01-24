@@ -279,7 +279,6 @@ class Stages(object):
 #        run_stage(self.state, 'generate_stats', command)
 
 
-
 #Rscript --vanilla ~/vh83/pipelines/code/summary_stat.R \
 #        metrics/${sample_run_name}.sort.bedtools_hist_all.txt \
 #        metrics/${sample_run_name}.sort.mapped_to_genome.txt \
@@ -287,3 +286,15 @@ class Stages(object):
 #        metrics/${sample_run_name}.sort.total_raw_reads.txt \
 #        ${sample_run_name} \
 #        ${summary_prefix}_summary_coverage.txt
+
+#####  Deal with undr_rover vcfs
+
+def apply_cat_vcf(self, inputs, vcf_out):
+        '''Concatenate and sort undr_rover VCF files for downstream analysis'''
+
+        vcfs = ' '.join([vcf for vcf in inputs])
+        # safe_make_dir('variants')
+        command = 'vcf-concat {vcfs} | vcf-sort -c | bgzip -c > {vcf_out} '.format(vcfs=vcfs,vcf_out=vcf_out)
+        run_stage(self.state, 'apply_cat_vcf', command)
+
+
