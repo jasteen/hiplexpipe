@@ -287,3 +287,25 @@ class Stages(object):
 #        metrics/${sample_run_name}.sort.total_raw_reads.txt \
 #        ${sample_run_name} \
 #        ${summary_prefix}_summary_coverage.txt
+
+def sort_vcfs(self, vcf_in, vcf_out):
+        '''sort and bgzip vcf files before concatenation'''
+        commmand = 'bcftools sort -o {vcf_out} -O z {vcf_in}'.format(vcf_out=vcf_out, vcf_in=vcf_in)
+        run_stage(self.state, 'sort_vcfs', command)
+
+    def index_vcfs(self, vcf_in, vcf_out):
+        '''index vcfs with bcftools'''
+        commmand = 'bcftools index --tbi -f {vcf_in}'.format(vcf_in=vcf_in)
+        run_stage(self.state, 'index_vcfs', command)
+
+    def concatenate_vcfs(self, vcf_files_in, vcf_out):
+        '''concatenate undr_rover vcfs'''
+        vcf_files = ' '.join(['vcf for vcf in vcf_files_in'])
+        command = 'bcftools concat -a -o {vcf_out} -O z {vcf_files}'.format(vcf_out=vcf_out, vcf_files=vcf_files)
+        run_stage(self.state, 'concatenate_vcfs', command)
+
+    def index_final_vcf(self, vcf_in, vcf_out):
+        '''indexing final undr_rover vcf'''
+        command = 'bcftools index -f {vcf_in}'.format(vcf_in=vcf_in}
+        run_stage(self.state, 'index_final_vcf', command)
+
