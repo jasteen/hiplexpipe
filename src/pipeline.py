@@ -44,7 +44,7 @@ def make_pipeline(state):
         # sample specific configuration options
         extras=['{sample[0]}', '{lib[0]}'],
         # The output file name is the sample name with a .bam extension.
-        output='alignments/{sample[0]}.bam')
+        output='alignments/{sample[0]}.clipped.bam')
 
 
     # Call variants using undr_rover
@@ -67,40 +67,31 @@ def make_pipeline(state):
         task_func=stages.sort_bam_picard,
         name='sort_bam_picard',
         input=output_from('align_bwa'),
-        filter=suffix('.bam'),
-        output='.sort.bam')
+        filter=suffix('.clipped.bam'),
+        output='.clipped.sort.bam')
 
     # High quality and primary alignments
     pipeline.transform(
         task_func=stages.primary_bam,
         name='primary_bam',
         input=output_from('sort_bam_picard'),
-        filter=suffix('.sort.bam'),
-        output='.sort.hq.bam')
+        filter=suffix('.clipped.sort.bam'),
+        output='.clipped.sort.hq.bam')
 
     # index bam file
     pipeline.transform(
         task_func=stages.index_sort_bam_picard,
         name='index_bam',
         input=output_from('primary_bam'),
-        filter=suffix('.sort.hq.bam'),
-        output='.sort.hq.bam.bai')
+        filter=suffix('.clipped.sort.hq.bam'),
+        output='.clipped.sort.hq.bam.bai')
 
-    # Clip the primer_seq from BAM File
-    (pipeline.transform(
-        task_func=stages.clip_bam,
-        name='clip_bam',
-        input=output_from('primary_bam'),
-        filter=suffix('.sort.hq.bam'),
-        output='.sort.hq.clipped.bam')
-        .follows('index_bam'))
-    
     # generate mapping metrics.
     pipeline.transform(
         task_func=stages.intersect_bed,
         name='intersect_bed',
-        input=output_from('clip_bam'),
-        filter=suffix('.sort.hq.clipped.bam'),
+        input=output_from('primary_bam'),
+        filter=suffix('.clipped.sort.hq.bam'),
         output='.intersectbed.bam')
 
     pipeline.transform(
@@ -113,8 +104,8 @@ def make_pipeline(state):
     pipeline.transform(
         task_func=stages.genome_reads,
         name='genome_reads',
-        input=output_from('clip_bam'),
-        filter=suffix('.sort.hq.clipped.bam'),
+        input=output_from('primary_bam'),
+        filter=suffix('.clipped.sort.hq.bam'),
         output='.mapped_to_genome.txt')
 
     pipeline.transform(
@@ -128,26 +119,26 @@ def make_pipeline(state):
         task_func=stages.total_reads,
         name='total_reads',
         input=output_from('align_bwa'),
-        filter=suffix('.bam'),
+        filter=suffix('.clipped.bam'),
         output='.total_raw_reads.txt')
 
-    pipeline.collate(
-        task_func=stages.generate_stats,
-        name='generate_stats',
-        filter=formatter('.+/(?P<sample>.+).(?P<section>.+).txt'),
-        input=['{sample(0)}.bedtools_hist_all.txt', '{sample(0)}.mapped_to_genome.txt', '{sample(0)}.mapped_to_target.txt', '{sample(0)}.total_raw_reads.txt'], 
-        extras=['{sample(0)}'],
-        output='all_sample.summary.txt')
+#    pipeline.transform(
+#        task_func=stages.generate_stats,
+#        name='generate_stats',
+#        input=output_from(['coverage_bed', 'genome_reads', 'target_reads', 'total_reads']), 
+#        filter=formatter('.+/(?P<sample>.+).txt'),
+#        extras=['{sample[0]}'],
+#        output='all_sample.summary.txt')
 
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
     (pipeline.transform(
         task_func=stages.call_haplotypecaller_gatk,
         name='call_haplotypecaller_gatk',
-        input=output_from('clip_bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).sort.hq.clipped.bam'),
+        input=output_from('primary_bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).clipped.sort.hq.bam'),
         output='variants/gatk/{sample[0]}.g.vcf')
-        .follows('clip_bam'))
+        .follows('index_sort_bam_picard'))
 
     # Combine G.VCF files for all samples using GATK
     pipeline.merge(
@@ -209,8 +200,6 @@ def make_pipeline(state):
         output='.raw.annotate.filtered.vep.vcf')
         .follows('apply_variant_filtration_gatk'))
 
-
-
     # Apply SnpEff
     #(pipeline.transform(
     #    task_func=stages.apply_snpeff,
@@ -246,65 +235,5 @@ def make_pipeline(state):
     #     filter=suffix('.vcf.gz'),
     #     output='.vep.vcf')
     #     .follows('apply_cat_vcf'))
-    #
-    # # Apply vcfanno on concatenated/vep undr_rover vcf file
-    # (pipeline.transform(
-    #     task_func=stages.apply_vcfanno,
-    #     name='apply_vcfanno_ur',
-    #     input=output_from('apply_vep_ur'),
-    #     filter=suffix('.vep.vcf'),
-    #     output='.vep.anno.vcf')
-    #     .follows('apply_vep_ur'))
-    #
-    # # Apply snpeff
-    # (pipeline.transform(
-    #     task_func=stages.apply_snpeff,
-    #     name='apply_snpeff_ur',
-    #     input=output_from('apply_vcfanno_ur'),
-    #     filter=suffix('.vep.anno.vcf'),
-    #     output='.vep.anno.snpeff.vcf.gz')
-    #     .follows('apply_vcfanno_ur'))
-    #
-    # Apply tabix
-    #pipeline.transform(
-    #    task_func=stages.apply_tabix,
-    #    name='apply_tabix',
-    #    input=output_from('apply_cat_vcf'),
-    #    filter=suffix('.vcf.gz'),
-    #    output='.vcf.gz.tbi')
-
-    # # Apply HomopolymerRun
-    # (pipeline.transform(
-    #     task_func=stages.apply_homopolymer_ann,
-    #     name='apply_homopolymer_ann',
-    #     input=output_from('apply_snpeff_ur'),
-    #     filter=suffix('.vep.anno.snpeff.vcf.gz'),
-    #     output='.annotated.vcf')
-    #     .follows('apply_tabix'))
-
-    # # Apply summarize multi coverage
-    # (pipeline.merge(
-    #     task_func=stages.apply_multicov,
-    #     name='apply_multicov',
-    #     input=output_from('primary_bam'),
-    #     # filter=suffix('.primary.bam'),
-    #     output='coverage/all.multicov.txt')
-    #     .follows('index_bam'))
-
-    # Apply summarize picard coverage
-    # (pipeline.merge(
-    #     task_func=stages.apply_summarize_picard,
-    #     name='apply_summarize_picard',
-    #     input=output_from('target_coverage'),
-    #     output='coverage/all.hsmetrics.txt')
-    #     .follows('target_coverage'))
-
-    # # Apply summarize multicov coverage plots
-    # (pipeline.merge(
-    #     task_func=stages.apply_multicov_plots,
-    #     name='apply_multicov_plots',
-    #     input=output_from('apply_multicov'),
-    #     output='coverage/coverage_analysis_main.html')
-    #     .follows('apply_multicov'))
-
+    
     return pipeline

@@ -41,7 +41,6 @@ class Stages(object):
         self.hapmap = self.get_options('hapmap')
         self.bamclipper = self.get_options('bamclipper')
         self.coord_file = self.get_options('coord_file')
-        self.target_bed = self.get_options('target_bed')
         self.interval_file = self.get_options('interval_file')
         self.primer_file = self.get_options('primer_file')
         self.primer_bedpe_file = self.get_options('primer_bedpe_file')
@@ -76,12 +75,15 @@ class Stages(object):
         read_group = '"@RG\\tID:{sample}\\tSM:{sample}\\tPU:lib1\\tPL:Illumina"' \
             .format(sample=sample_id)
         command = 'bwa mem -M -t {cores} -R {read_group} {reference} {fastq_read1} {fastq_read2} ' \
+                  '| {bamclipper} -i -p {primer_bedpe_file} -n 1 ' \
                   '| samtools view -b -h -o {bam} -' \
                   .format(cores=cores,
                           read_group=read_group,
                           fastq_read1=fastq_read1_in,
                           fastq_read2=fastq_read2_in,
                           reference=self.reference,
+                          bamclipper=self.bamclipper,
+                          primer_bedpe_file=self.primer_bedpe_file,
                           bam=bam_out)
         run_stage(self.state, 'align_bwa', command)
 
@@ -114,12 +116,6 @@ class Stages(object):
                         fastq_read1=fastq_read1_in,
                         fastq_read2=fastq_read2_in)
         run_stage(self.state, 'apply_undr_rover', command)
-
-    def clip_bam(self, bam_in, sorted_bam_out):
-        '''Clip the BAM file using Bamclipper'''
-        bamclipper_args = '{bamclipper} -b {bam_in} -p {primer_bedpe_file} -n 1'.format(
-                          bamclipper=self.bamclipper, bam_in=bam_in, primer_bedpe_file=self.primer_bedpe_file)
-        run_stage(self.state, 'clip_bam', bamclipper_args)
 
     def sort_bam_picard(self, bam_in, sorted_bam_out):
         '''Sort the BAM file using Picard'''
@@ -245,7 +241,6 @@ class Stages(object):
 
     def intersect_bed(self, bam_in, bam_out):
         '''intersect the bed file with the interval file '''
-        safe_make_dir('alignments/metrics')
         command = "intersectBed -abam {bam_in} -b {interval_file} > {bam_out} ".format(
                      bam_in=bam_in, interval_file=self.interval_file, bam_out=bam_out)
         run_stage(self.state, 'intersect_bed', command)           
@@ -255,7 +250,7 @@ class Stages(object):
         ''' make coverage files '''
         command = "coverageBed -b {bam_in} -a {interval_file} -hist | grep all > {txt_out}".format(
                      bam_in=bam_in, interval_file=self.interval_file, txt_out=txt_out)
-        run_stage(self.state, 'coverage_files', command)
+        run_stage(self.state, 'coverage_bed', command)
     
     def genome_reads(self, bam_in, txt_out):
         '''count reads that map to the genome'''
@@ -275,13 +270,13 @@ class Stages(object):
                         bam_in=bam_in, txt_out=txt_out)
         run_stage(self.state, 'total_reads', command)
 
-    def generate_stats(self, inputs, txt_out):
-        '''run R stats script'''
-        a, b, c, d, e = inputs
-        command = 'Rscript --vanilla /projects/vh83/pipelines/code/modified_summary_stat.R \
-                    {hist_in} {map_genome_in} {map_target_in} {raw_reads_in} {sample_name} \
-                    {txt_out}'.format(hist_in=a, map_genome_in=b, map_target_in=c, raw_reads_in=d , sample_name=e , txt_out=txt_out)
-        run_stage(self.state, 'generate_stats', command)
+#    def generate_stats(self, inputs, txt_out):
+#        '''run R stats script'''
+#        a, b, c, d, e = inputs
+#        command = 'Rscript --vanilla /projects/vh83/pipelines/code/modified_summary_stat.R \
+#                    {hist_in} {map_genome_in} {map_target_in} {raw_reads_in} {sample_name} \
+#                    {txt_out}'.format(hist_in=a, map_genome_in=b, map_target_in=c, raw_reads_in=d , sample_name=e , txt_out=txt_out)
+#        run_stage(self.state, 'generate_stats', command)
 
 
 
