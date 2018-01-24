@@ -288,7 +288,7 @@ class Stages(object):
 #        ${sample_run_name} \
 #        ${summary_prefix}_summary_coverage.txt
 
-def sort_vcfs(self, vcf_in, vcf_out):
+    def sort_vcfs(self, vcf_in, vcf_out):
         '''sort and bgzip vcf files before concatenation'''
         commmand = 'bcftools sort -o {vcf_out} -O z {vcf_in}'.format(vcf_out=vcf_out, vcf_in=vcf_in)
         run_stage(self.state, 'sort_vcfs', command)
